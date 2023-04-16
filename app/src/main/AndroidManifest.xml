@@ -16,6 +16,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Taller2CM"
         tools:targetApi="31">
+        <provider
+            android:authorities="com.example.taller2cm.fileprovider"
+            android:name="androidx.core.content.FileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+
+
+
+        </provider>
+
         <activity
             android:name=".PhotoActivity"
             android:exported="false" />
