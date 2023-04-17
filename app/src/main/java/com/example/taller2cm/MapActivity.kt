@@ -5,6 +5,10 @@ import android.app.UiModeManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
@@ -131,7 +135,7 @@ class MapActivity : AppCompatActivity() {
             }
 
         mLocationRequest = LocationRequest.create()
-            .setInterval(1000)
+            .setInterval(100)
             .setFastestInterval(5000)
             .setSmallestDisplacement(30f)
             .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
@@ -290,6 +294,9 @@ class MapActivity : AppCompatActivity() {
         map.invalidate()
     }
 
+    private lateinit var sensorManager: SensorManager
+    private lateinit var lightSensor: Sensor
+
 
 
 
@@ -300,19 +307,54 @@ class MapActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         val mapController = map.controller
+
+        // Get a reference to the SensorManager
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+
+        // Get a reference to the light sensor
+        lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
+
+        // Register a listener for the light sensor
+        sensorManager.registerListener(lightSensorListener, lightSensor, SensorManager.SENSOR_DELAY_NORMAL)
+
+
         mapController.zoomTo(18.0)
         mapController.setCenter(startPoint)
         mapController.animateTo(bogota)
         val uiManager = getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
-        if(uiManager.nightMode == UiModeManager.MODE_NIGHT_YES) {
-            map.overlayManager.tilesOverlay.setColorFilter(TilesOverlay.INVERT_COLORS)
-        }
+
+
+
     }
+
+    
 
     override fun onPause() {
         super.onPause()
         map.onPause()
         stopLocationUpdates()
+        sensorManager.unregisterListener(lightSensorListener)
+    }
+
+    private val lightSensorListener = object : SensorEventListener {
+        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+            // Do nothing
+        }
+
+        override fun onSensorChanged(event: SensorEvent?) {
+            // Check if the sensor type is the light sensor
+            if (event?.sensor?.type == Sensor.TYPE_LIGHT) {
+                // Get the luminance value from the sensor event
+                val luminance = event.values[0]
+
+                // Use the luminance value to adjust the map color filter
+                if (luminance < 10) {
+                    map.overlayManager.tilesOverlay.setColorFilter(TilesOverlay.INVERT_COLORS)
+                } else {
+                    map.overlayManager.tilesOverlay.setColorFilter(null)
+                }
+            }
+        }
     }
 
     private fun startLocationUpdates() {
