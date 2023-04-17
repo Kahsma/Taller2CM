@@ -13,6 +13,7 @@ import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import android.preference.PreferenceManager
 import android.view.inputmethod.EditorInfo
+import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -159,6 +160,13 @@ class MapActivity : AppCompatActivity() {
             )
         }
 
+        val myButton = findViewById<Button>(R.id.button)
+
+        myButton.setOnClickListener {
+            readJSONAndDrawRoutes()
+
+        }
+
 
 
 
@@ -226,6 +234,26 @@ class MapActivity : AppCompatActivity() {
 
     }
 
+    private fun readJSONAndDrawRoutes() {
+        val filename = "locations.json"
+        val file = File(getExternalFilesDir(null), filename)
+
+        try {
+            // Read the JSON array from the file
+            val json = JSONObject(file.readText()).getJSONArray("locations")
+
+            // Draw route for each pair of consecutive points in the JSON array, starting from uLocation
+            var startPoint = uLocation
+            for (i in 0 until json.length()) {
+                val endPoint = GeoPoint(json.getJSONObject(i).getString("latitud").toDouble(), json.getJSONObject(i).getString("longitud").toDouble())
+                drawRouteBlue(startPoint, endPoint)
+                startPoint = endPoint
+            }
+        } catch (e: Exception) {
+            // Log error
+        }
+    }
+
 
 
 
@@ -243,6 +271,21 @@ class MapActivity : AppCompatActivity() {
 
         // Create a new route overlay and add it to the map
         routeOverlay = RoadManager.buildRoadOverlay(road, Color.RED, 12f)
+        map.overlays.add(routeOverlay)
+        map.invalidate()
+    }
+
+    private fun drawRouteBlue(startPoint: GeoPoint, endPoint: GeoPoint) {
+        // Remove existing route overlay, if any
+//        if (routeOverlay != null) {
+//            map.overlays.remove(routeOverlay)
+//        }
+
+        // Get the road from the RoadManager
+        val road = roadManager.getRoad(arrayListOf(startPoint, endPoint))
+
+        // Create a new route overlay and add it to the map
+        routeOverlay = RoadManager.buildRoadOverlay(road, Color.BLUE, 12f)
         map.overlays.add(routeOverlay)
         map.invalidate()
     }
