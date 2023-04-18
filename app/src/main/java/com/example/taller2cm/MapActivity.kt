@@ -179,7 +179,7 @@ class MapActivity : AppCompatActivity() {
     private fun createOverlayEvents(): MapEventsOverlay {
         val receiver = object : MapEventsReceiver {
             override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
-                TODO("Not yet implemented")
+                return false
             }
 
 
@@ -327,7 +327,7 @@ class MapActivity : AppCompatActivity() {
 
     }
 
-    
+
 
     override fun onPause() {
         super.onPause()

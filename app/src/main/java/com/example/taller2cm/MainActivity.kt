@@ -89,7 +89,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun mapLogic(){
+    private fun mapLogic(){
         if (ContextCompat.checkSelfPermission(
                 baseContext,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -106,7 +106,7 @@ class MainActivity : AppCompatActivity() {
 
 
         }else if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)){
-            showRationaleDialog()
+            showLocationRatinaleDialog()
         }else {
             // Permission not granted, request it
             ActivityCompat.requestPermissions(
@@ -245,7 +245,7 @@ class MainActivity : AppCompatActivity() {
             .setPositiveButton("OK"){_,_->
                 ActivityCompat.requestPermissions(
                     this,
-                    arrayOf(Manifest.permission.CAMERA),
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                     REQUEST_LOCATION_PERMISSION
                 )
             }
