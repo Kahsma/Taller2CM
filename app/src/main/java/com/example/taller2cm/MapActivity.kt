@@ -81,6 +81,14 @@ class MapActivity : AppCompatActivity() {
         map.setMultiTouchControls(true)
         map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
         map.overlays.add(createOverlayEvents())
+        // Get a reference to the SensorManager
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+
+        // Get a reference to the light sensor
+        lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
+
+        // Register a listener for the light sensor
+        sensorManager.registerListener(lightSensorListener, lightSensor, SensorManager.SENSOR_DELAY_NORMAL)
 
 
         val myEditText = findViewById<EditText>(R.id.locationEditText)
@@ -308,20 +316,14 @@ class MapActivity : AppCompatActivity() {
         super.onResume()
         val mapController = map.controller
 
-        // Get a reference to the SensorManager
-        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
 
-        // Get a reference to the light sensor
-        lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
-
-        // Register a listener for the light sensor
-        sensorManager.registerListener(lightSensorListener, lightSensor, SensorManager.SENSOR_DELAY_NORMAL)
 
 
         mapController.zoomTo(18.0)
         mapController.setCenter(startPoint)
         mapController.animateTo(bogota)
-        val uiManager = getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
+        getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
+
 
 
 
